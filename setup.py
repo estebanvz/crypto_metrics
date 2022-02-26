@@ -24,9 +24,9 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.7.9",
     install_requires=[
-       "numpy==1.21.5",
-       "pandas==1.3.4",
-       "scipy==1.7.3",
-       "https://github.com/estebanvz/eta-lib"
+       "numpy>=1.21.5",
+       "pandas>=1.3.4",
+       "scipy>=1.7.3",
+       "etalib @ https://github.com/estebanvz/eta-lib"
    ],
 )
