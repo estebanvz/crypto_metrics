@@ -1,6 +1,6 @@
 # %%
 import logging
-import btalib
+import etalib
 import pandas as pd
 import os
 import numpy as np
@@ -33,21 +33,21 @@ class CryptoDataTransformation:
 
 def linearRegression(data, lengthKC=20):
     source = data['Close']
-    tmp = btalib.sma(source, period=lengthKC)
-    tmpmin = btalib.min(data['Low'], period=lengthKC)
-    tmpmax = btalib.max(data['High'], period=lengthKC)
-    val = btalib.linearreg(
+    tmp = etalib.sma(source, period=lengthKC)
+    tmpmin = etalib.min(data['Low'], period=lengthKC)
+    tmpmax = etalib.max(data['High'], period=lengthKC)
+    val = etalib.linearreg(
         source - (((tmpmax + tmpmin)/2 + tmp)/2), period=lengthKC)
     return val
 
 
 def adx(btc_df, num=23, slope=False, dmi=True):
-    btc_df["adx"] = btalib.adx(
+    btc_df["adx"] = etalib.adx(
         btc_df["High"], btc_df["Low"], btc_df["Close"], period=14).df
     if(dmi):
-        btc_df["mdm"] = btalib.minus_dm(
+        btc_df["mdm"] = etalib.minus_dm(
             btc_df["High"], btc_df["Low"], period=14).df
-        btc_df["pdm"] = btalib.plus_dm(
+        btc_df["pdm"] = etalib.plus_dm(
             btc_df["High"], btc_df["Low"], period=14).df
     if(slope):
         tmp = []
