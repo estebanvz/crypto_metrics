@@ -27,6 +27,6 @@ setuptools.setup(
        "numpy>=1.21.5",
        "pandas>=1.3.4",
        "scipy>=1.7.3",
-       "etalib @ https://github.com/estebanvz/eta-lib"
+       "etalib @ https://github.com/estebanvz/eta-lib.git"
    ],
 )
