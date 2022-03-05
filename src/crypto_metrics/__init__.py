@@ -12,7 +12,7 @@ class CryptoDataTransformation:
         self.criptos = criptos
         if(os.path.isdir(self.save_path) is False):
             logging.warning("The file {} do not exist!".format(save_path))
-    def readDataset(self):
+    def readDataset(self, lr_len=20,adx_len=14,emas=[55,21,10]):
         for cripto in self.criptos:
             bars = np.loadtxt("{}/{}.csv".format(self.save_path,cripto), delimiter="|")
             newBars = []
@@ -24,9 +24,10 @@ class CryptoDataTransformation:
                 int), unit='ms').dt.tz_localize('UTC').dt.tz_convert('America/Santarem')
             btc_df.set_index('Index', inplace=True)
             btc_df.astype(float)
-            val = linearRegression(btc_df, 20)
+            val = linearRegression(btc_df, lr_len)
             btc_df["lr"] = val.df
-            btc_df = adx(btc_df, 23)
+            btc_df = adx(btc_df, adx_len=adx_len)
+            btc_df = emas(btc_df,emas=emas)
             path = "{}/{}.csv".format(self.save_path,cripto)
             btc_df= btc_df.dropna()
             btc_df.to_csv(path,sep="|",header=True)
@@ -41,14 +42,14 @@ def linearRegression(data, lengthKC=20):
     return val
 
 
-def adx(btc_df, num=23, slope=False, dmi=True):
+def adx(btc_df, num=23, adx_len =14, slope=False, dmi=True):
     btc_df["adx"] = etalib.adx(
-        btc_df["High"], btc_df["Low"], btc_df["Close"], period=14).df
+        btc_df["High"], btc_df["Low"], btc_df["Close"], period=adx_len).df
     if(dmi):
         btc_df["mdm"] = etalib.minus_dm(
-            btc_df["High"], btc_df["Low"], period=14).df
+            btc_df["High"], btc_df["Low"], period=adx_len).df
         btc_df["pdm"] = etalib.plus_dm(
-            btc_df["High"], btc_df["Low"], period=14).df
+            btc_df["High"], btc_df["Low"], period=adx_len).df
     if(slope):
         tmp = []
         for e in btc_df["adx"]:
@@ -58,3 +59,6 @@ def adx(btc_df, num=23, slope=False, dmi=True):
                 tmp.append(0)
         btc_df["adx23"] = tmp
     return btc_df
+def emas(btc_df, emas=[55,21,10]):
+    for ema in emas:
+        btc_df[str(ema)]= etalib.ema(btc_df["Close"],ema)
