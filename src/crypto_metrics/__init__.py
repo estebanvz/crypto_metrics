@@ -61,4 +61,5 @@ def adx(btc_df, num=23, adx_len =14, slope=False, dmi=True):
     return btc_df
 def emas(btc_df, emas=[55,21,10]):
     for ema in emas:
-        btc_df[str(ema)]= etalib.ema(btc_df["Close"],ema)
+        btc_df[str(ema)]= etalib.ema(btc_df["Close"],period=ema).df
+    return btc_df
