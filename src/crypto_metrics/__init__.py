@@ -1,10 +1,9 @@
-# %%
-import logging
-import etalib
-import pandas as pd
+#%%
 import os
+import logging
 import numpy as np
-
+import pandas as pd
+import pandas_ta as ta
 
 class CryptoDataTransformation:
     def __init__(self, save_path="./datasets/1h", criptos=["BTCUSDT"]) -> None:
@@ -24,32 +23,31 @@ class CryptoDataTransformation:
                 int), unit='ms').dt.tz_localize('UTC').dt.tz_convert('America/Santarem')
             btc_df.set_index('Index', inplace=True)
             btc_df.astype(float)
-            val = linearRegression(btc_df, lr_len)
-            btc_df["lr"] = val.df
+            btc_df["lr"] = linearRegression(btc_df, lr_len)
             btc_df = adx(btc_df, adx_len=adx_len)
             btc_df = emas(btc_df,emas=emas_len)
             path = "{}/{}.csv".format(self.save_path,cripto)
             btc_df= btc_df.dropna()
             btc_df.to_csv(path,sep="|",header=True)
+#%%
 
 def linearRegression(data, lengthKC=20):
     source = data['Close']
-    tmp = etalib.sma(source, period=lengthKC)
-    tmpmin = etalib.min(data['Low'], period=lengthKC)
-    tmpmax = etalib.max(data['High'], period=lengthKC)
-    val = etalib.linearreg(
-        source - (((tmpmax + tmpmin)/2 + tmp)/2), period=lengthKC)
+    tmp = ta.sma(source, period=lengthKC)
+    # tmpmin = ta.min(data['Low'], period=lengthKC)
+    tmpmin = data['Low'].rolling(window = lengthKC).min()
+    tmpmax = data['Low'].rolling(window = lengthKC).max()
+    # tmpmax = ta.max(data['High'], period=lengthKC)
+    aux = source - (((tmpmax + tmpmin)/2 + tmp)/2)
+    val = ta.linreg(aux, length=lengthKC)
     return val
 
-
 def adx(btc_df, num=23, adx_len =14, slope=False, dmi=True):
-    btc_df["adx"] = etalib.adx(
-        btc_df["High"], btc_df["Low"], btc_df["Close"], period=adx_len).df
-    if(dmi):
-        btc_df["mdm"] = etalib.minus_dm(
-            btc_df["High"], btc_df["Low"], period=adx_len).df
-        btc_df["pdm"] = etalib.plus_dm(
-            btc_df["High"], btc_df["Low"], period=adx_len).df
+    tmp = ta.adx(
+        btc_df["High"], btc_df["Low"], btc_df["Close"], period=adx_len)
+    btc_df["adx"] = tmp[[f"ADX_{adx_len}"]]
+    btc_df["mdm"] = tmp[[f"DMN_{adx_len}"]]
+    btc_df["pdm"] = tmp[[f"DMP_{adx_len}"]]
     if(slope):
         tmp = []
         for e in btc_df["adx"]:
@@ -61,5 +59,11 @@ def adx(btc_df, num=23, adx_len =14, slope=False, dmi=True):
     return btc_df
 def emas(btc_df, emas=[55,21,10]):
     for ema in emas:
-        btc_df[str(ema)]= etalib.ema(btc_df["Close"],period=ema).df
+        btc_df[str(ema)]= ta.ema(btc_df["Close"],period=ema)
     return btc_df
+# %%
+if __name__=="__main__":
+    CDT = CryptoDataTransformation()
+    transformer = CryptoDataTransformation()
+    transformer.readDataset()   
+# %%
