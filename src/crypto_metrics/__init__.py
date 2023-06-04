@@ -39,7 +39,7 @@ def linearRegression(data, lengthKC=20):
     tmpmax = data['Low'].rolling(window = lengthKC).max()
     # tmpmax = ta.max(data['High'], period=lengthKC)
     aux = source - (((tmpmax + tmpmin)/2 + tmp)/2)
-    val = ta.linreg(aux, length=lengthKC)
+    val = ta.linreg(aux, length=lengthKC,slope=True)
     return val
 
 def adx(btc_df, num=23, adx_len =14, slope=False, dmi=True):
