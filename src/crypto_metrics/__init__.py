@@ -14,7 +14,7 @@ class CryptoDataTransformation:
     def readDataset(self, lr_len=20,adx_len=14,emas_len=[55,21,10]):
         for cripto in self.criptos:
             path = "{}/{}.csv".format(self.save_path,cripto)
-            if not os.path.isfile():
+            if not os.path.exists(path):
                 print(f"{cripto}: is empty")
                 return
             bars = np.loadtxt(path, delimiter="|")
