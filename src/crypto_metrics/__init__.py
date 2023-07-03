@@ -16,7 +16,7 @@ class CryptoDataTransformation:
             path = "{}/{}.csv".format(self.save_path,cripto)
             if not os.path.exists(path):
                 print(f"{cripto}: is empty")
-                return
+                continue
             bars = np.loadtxt(path, delimiter="|")
             newBars = []
             for line in bars:
