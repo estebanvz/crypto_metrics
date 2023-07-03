@@ -11,7 +11,7 @@ class CryptoDataTransformation:
         self.criptos = criptos
         if(os.path.isdir(self.save_path) is False):
             logging.warning("The file {} do not exist!".format(save_path))
-    def readDataset(self, lr_len=20,adx_len=14,emas_len=[55,21,10]):
+    def readDataset(self, lr_len=20,adx_len=14,emas_len=[55,21,10], remove=True):
         for cripto in self.criptos:
             path = "{}/{}.csv".format(self.save_path,cripto)
             if not os.path.exists(path):
@@ -31,7 +31,9 @@ class CryptoDataTransformation:
             btc_df = adx(btc_df, adx_len=adx_len)
             btc_df = emas(btc_df,emas=emas_len)
             btc_df= btc_df.dropna()
-            btc_df.to_csv(path,sep="|",header=True)
+            if remove:
+                os.remove(path)
+            btc_df.to_csv(f"{self.save_path}/{cripto}_silver.csv",sep="|",header=True)
 #%%
 
 def linearRegression(data, lengthKC=20):
