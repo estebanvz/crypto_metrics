@@ -13,7 +13,11 @@ class CryptoDataTransformation:
             logging.warning("The file {} do not exist!".format(save_path))
     def readDataset(self, lr_len=20,adx_len=14,emas_len=[55,21,10]):
         for cripto in self.criptos:
-            bars = np.loadtxt("{}/{}.csv".format(self.save_path,cripto), delimiter="|")
+            path = "{}/{}.csv".format(self.save_path,cripto)
+            if not os.path.isfile():
+                print(f"{cripto}: is empty")
+                return
+            bars = np.loadtxt(path, delimiter="|")
             newBars = []
             for line in bars:
                 newBars.append(line[:6])
@@ -26,7 +30,6 @@ class CryptoDataTransformation:
             btc_df["lr"] = linearRegression(btc_df, lr_len)
             btc_df = adx(btc_df, adx_len=adx_len)
             btc_df = emas(btc_df,emas=emas_len)
-            path = "{}/{}.csv".format(self.save_path,cripto)
             btc_df= btc_df.dropna()
             btc_df.to_csv(path,sep="|",header=True)
 #%%
